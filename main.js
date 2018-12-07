@@ -19,7 +19,7 @@ class Block{
     }
 
     calculateHash(){
-        return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString()
+        return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString()
     }
 
     mineBlock(difficulty){
@@ -51,6 +51,7 @@ class BlockChain{
 
     minePendingTransactions(miningRewardAddress){
         let block = new Block(Date.now(), this.pendingTransactions)
+        block.previousHash = this.getLatestBlock().hash
         block.mineBlock(this.difficulty)
 
         console.log('Block successfully mined')
