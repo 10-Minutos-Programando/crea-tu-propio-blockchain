@@ -1,16 +1,16 @@
 const SHA256 = require('crypto-js/sha256')
 
-class Transaction{
-    constructor(fromAddress, toAddress, amount){
+class Transaction {
+    constructor(fromAddress, toAddress, amount) {
         this.fromAddress = fromAddress
         this.toAddress = toAddress
         this.amount = amount
     }
 }
 
-class Block{
+class Block {
 
-    constructor(timestamp, transactions, previousHash = ''){        
+    constructor(timestamp, transactions, previousHash = '') {
         this.timestamp = timestamp
         this.transactions = transactions
         this.previousHash = previousHash
@@ -18,12 +18,12 @@ class Block{
         this.nonce = 0
     }
 
-    calculateHash(){
+    calculateHash() {
         return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString()
     }
 
-    mineBlock(difficulty){
-        while(this.hash.substring(0, difficulty) !== Array(difficulty+1).join('0')){
+    mineBlock(difficulty) {
+        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
             this.nonce++
             this.hash = this.calculateHash()
         }
@@ -32,24 +32,24 @@ class Block{
 
 }
 
-class BlockChain{
-    
-    constructor(){
+class BlockChain {
+
+    constructor() {
         this.chain = [this.createGenesisBlock()]
-        this.difficulty = 2
+        this.difficulty = 4
         this.pendingTransactions = []
         this.miningReward = 100
     }
 
-    createGenesisBlock(){
+    createGenesisBlock() {
         return new Block('01/01/2018', 'Genesis Block', '0')
     }
 
-    getLatestBlock(){
+    getLatestBlock() {
         return this.chain[this.chain.length - 1]
     }
 
-    minePendingTransactions(miningRewardAddress){
+    minePendingTransactions(miningRewardAddress) {
         let block = new Block(Date.now(), this.pendingTransactions)
         block.previousHash = this.getLatestBlock().hash
         block.mineBlock(this.difficulty)
@@ -62,19 +62,19 @@ class BlockChain{
         ]
     }
 
-    createTransaction(transaction){
+    createTransaction(transaction) {
         this.pendingTransactions.push(transaction)
     }
 
-    getBalanceOfAddress(address){
+    getBalanceOfAddress(address) {
         let balance = 0
-        for(const block of this.chain){
-            for(const trans of block.transactions){
-                if(trans.fromAddress === address){
+        for (const block of this.chain) {
+            for (const trans of block.transactions) {
+                if (trans.fromAddress === address) {
                     balance -= trans.amount
                 }
 
-                if(trans.toAddress === address){
+                if (trans.toAddress === address) {
                     balance += trans.amount
                 }
             }
@@ -82,18 +82,18 @@ class BlockChain{
         return balance
     }
 
-    isChainValid(){
-        for(let i = 1; i < this.chain.length; i++){
+    isChainValid() {
+        for (let i = 1; i < this.chain.length; i++) {
             const currentBlock = this.chain[i]
-            const previousBlock = this.chain[i-1]
+            const previousBlock = this.chain[i - 1]
 
             // El hash del bloque no es válido
-            if(currentBlock.hash != currentBlock.calculateHash()){
+            if (currentBlock.hash != currentBlock.calculateHash()) {
                 return false
             }
 
             // Comprobamos si apunta al anterior
-            if (currentBlock.previousHash !== previousBlock.hash){
+            if (currentBlock.previousHash !== previousBlock.hash) {
                 return false
             }
         }
